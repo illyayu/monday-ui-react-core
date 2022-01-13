@@ -146,10 +146,6 @@ const ColorPickerContentComponent = ({
 
   const onColorClicked = useCallback(
     color => {
-      // TODO: mark the color as active, on selection. need to map from the element to the index somehow
-      // const colorIndex = colorsToRender.indexOf(color);
-      // setActiveIndex(colorIndex);
-
       if (!isMultiselect) {
         onValueChange([color]);
         return;
