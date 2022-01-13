@@ -12,6 +12,107 @@ import { DEFAULT_NUMBER_OF_COLORS_IN_LINE } from "../../ColorPickerConstants";
 import { calculateColorPickerWidth } from "../../services/ColorPickerStyleService";
 import "./ColorPickerContentComponent.scss";
 import useGridKeyboardNavigation from "../../../../hooks/useGridKeyboardNavigation";
+import { GridKeyboardNavigationContext, useGridKeyboardNavigationContext } from "../../GridKeyboardNavigationContext";
+
+const Colors = React.forwardRef(
+  (
+    {
+      onColorClicked,
+      colorsToRender,
+      numberOfColorsInLine,
+      focusOnMount,
+      value,
+      colorStyle,
+      ColorIndicatorIcon,
+      shouldRenderIndicatorWithoutBackground,
+      isMultiselect,
+      SelectedIndicatorIcon,
+      colorSize,
+      tooltipContentByColor
+    },
+    ref
+  ) => {
+    const onSelectionKey = useCallback(
+      selectedIndex => {
+        const color = colorsToRender[selectedIndex];
+        onColorClicked(color);
+      },
+      [colorsToRender, onColorClicked]
+    );
+
+    const { onBlur, onFocus, activeIndex, setActiveIndex } = useGridKeyboardNavigation({
+      focusOnMount,
+      ref,
+      activeIndex,
+      setActiveIndex,
+      onSelectionKey,
+      itemsCount: colorsToRender.length,
+      numberOfItemsInLine: numberOfColorsInLine
+    });
+
+    const onValueChange = useCallback(
+      (color, index) => () => {
+        setActiveIndex(index);
+        onColorClicked(color);
+      },
+      [onColorClicked, setActiveIndex]
+    );
+    return (
+      <ul className={cx("color-picker")} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
+        {colorsToRender.map((color, index) => {
+          return (
+            <ColorPickerItemComponent
+              key={color}
+              color={color}
+              onValueChange={onValueChange(color, index)}
+              value={value}
+              shouldRenderIndicatorWithoutBackground={ColorIndicatorIcon && shouldRenderIndicatorWithoutBackground}
+              colorStyle={colorStyle}
+              ColorIndicatorIcon={ColorIndicatorIcon}
+              SelectedIndicatorIcon={SelectedIndicatorIcon}
+              isSelected={isMultiselect ? value.includes(color) : value === color}
+              isActive={index === activeIndex}
+              isMultiselect={isMultiselect}
+              colorSize={colorSize}
+              tooltipContent={tooltipContentByColor[color]}
+            />
+          );
+        })}
+      </ul>
+    );
+  }
+);
+
+//TODO: is the forward ref required
+const ClearButton = React.forwardRef(({ onClick, text, Icon, isActive, onOutboundNavigation }, ref) => {
+  const { onBlur, onFocus, setActiveIndex } = useGridKeyboardNavigation({
+    ref,
+    onSelectionKey: onClick,
+    itemsCount: 1,
+    numberOfItemsInLine: 1,
+    onOutboundNavigation
+  });
+
+  const _onClick = useCallback(() => {
+    setActiveIndex(0);
+    onClick();
+  }, [onClick, setActiveIndex]);
+  return (
+    <Button
+      ref={ref}
+      size={Button.sizes.SMALL}
+      kind={Button.kinds.TERTIARY}
+      onClick={_onClick}
+      active={isActive}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      className="clear-color-button"
+    >
+      <Icon size="16" className="clear-color-icon" />
+      {text}
+    </Button>
+  );
+});
 
 const ColorPickerContentComponent = ({
   className,
@@ -36,6 +137,8 @@ const ColorPickerContentComponent = ({
   }, [onValueChange]);
 
   const ref = useRef(null);
+  const colorsRef = useRef(null);
+  const buttonRef = useRef(null);
 
   const colorsToRender = useMemo(() => {
     return isBlackListMode ? _difference(contentColors, colorsList) : _intersection(contentColors, colorsList);
@@ -43,8 +146,9 @@ const ColorPickerContentComponent = ({
 
   const onColorClicked = useCallback(
     color => {
-      const colorIndex = colorsToRender.indexOf(color);
-      setActiveIndex(colorIndex);
+      // TODO: mark the color as active, on selection. need to map from the element to the index somehow
+      // const colorIndex = colorsToRender.indexOf(color);
+      // setActiveIndex(colorIndex);
 
       if (!isMultiselect) {
         onValueChange([color]);
@@ -61,63 +165,32 @@ const ColorPickerContentComponent = ({
       }
       onValueChange(colors);
     },
-    [colorsToRender, isMultiselect, onValueChange, setActiveIndex, value]
+    [isMultiselect, onValueChange, value]
   );
 
-  const onSelectionKey = useCallback(
-    selectedIndex => {
-      const color = colorsToRender[selectedIndex];
-      onColorClicked(color);
-    },
-    [colorsToRender, onColorClicked]
-  );
-
-  const { onBlur, onFocus, activeIndex, setActiveIndex } = useGridKeyboardNavigation({
-    focusOnMount,
-    ref,
-    activeIndex,
-    setActiveIndex,
-    onSelectionKey,
-    itemsCount: colorsToRender.length,
-    numberOfItemsInLine: numberOfColorsInLine
-  });
-
+  const keyboardContext = useGridKeyboardNavigationContext([{ topElement: colorsRef, bottomElement: buttonRef }], ref);
   const width = calculateColorPickerWidth(colorSize, numberOfColorsInLine);
 
   return (
-    <div className={cx("color-picker-content--wrapper", className)} style={{ width }}>
-      <ul className={cx("color-picker")} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
-        {colorsToRender.map((color, index) => {
-          return (
-            <ColorPickerItemComponent
-              key={color}
-              color={color}
-              onValueChange={onColorClicked}
-              value={value}
-              shouldRenderIndicatorWithoutBackground={ColorIndicatorIcon && shouldRenderIndicatorWithoutBackground}
-              colorStyle={colorStyle}
-              ColorIndicatorIcon={ColorIndicatorIcon}
-              SelectedIndicatorIcon={SelectedIndicatorIcon}
-              isSelected={isMultiselect ? value.includes(color) : value === color}
-              isActive={index === activeIndex}
-              isMultiselect={isMultiselect}
-              colorSize={colorSize}
-              tooltipContent={tooltipContentByColor[color]}
-            />
-          );
-        })}
-      </ul>
-      {noColorText && (
-        <Button
-          size={Button.sizes.SMALL}
-          kind={Button.kinds.TERTIARY}
-          onClick={onClearButton}
-          className="clear-color-button"
-        >
-          <NoColorIcon size="16" className="clear-color-icon" />
-          {noColorText}
-        </Button>
-      )}
+    <div className={cx("color-picker-content--wrapper", className)} style={{ width }} ref={ref}>
+      <GridKeyboardNavigationContext.Provider value={keyboardContext}>
+        <Colors
+          ref={colorsRef}
+          onColorClicked={onColorClicked}
+          colorsToRender={colorsToRender}
+          numberOfColorsInLine={numberOfColorsInLine}
+          focusOnMount={focusOnMount}
+          value={value}
+          colorStyle={colorStyle}
+          ColorIndicatorIcon={ColorIndicatorIcon}
+          shouldRenderIndicatorWithoutBackground={shouldRenderIndicatorWithoutBackground}
+          isMultiselect={isMultiselect}
+          SelectedIndicatorIcon={SelectedIndicatorIcon}
+          colorSize={colorSize}
+          tooltipContentByColor={tooltipContentByColor}
+        />
+        {noColorText && <ClearButton Icon={NoColorIcon} onClick={onClearButton} text={noColorText} ref={buttonRef} />}
+      </GridKeyboardNavigationContext.Provider>
     </div>
   );
 };

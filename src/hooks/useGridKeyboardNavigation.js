@@ -1,6 +1,7 @@
-import { useCallback, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState, useContext } from "react";
 import { useFocusWithin } from "@react-aria/interactions";
 import useFullKeyboardListeners, { NAV_DIRECTIONS } from "./useFullKeyboardListeners";
+import { GridKeyboardNavigationContext } from "../components/ColorPicker/GridKeyboardNavigationContext";
 
 const NO_ACTIVE_INDEX = -1;
 
@@ -9,12 +10,13 @@ export default function useGridKeyboardNavigation({
   itemsCount,
   numberOfItemsInLine,
   onSelectionKey,
-  focusOnMount,
-  onOutboundNavigation
+  focusOnMount
 }) {
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX);
 
   const getIndexRow = useCallback(index => Math.ceil((index + 1) / numberOfItemsInLine), [numberOfItemsInLine]);
+
+  const keyboardContext = useContext(GridKeyboardNavigationContext);
 
   const onArrowNavigation = direction => {
     if (activeIndex === NO_ACTIVE_INDEX) {
@@ -59,7 +61,7 @@ export default function useGridKeyboardNavigation({
 
     const { isOutbound, nextIndex } = calcNextIndex();
     if (isOutbound) {
-      onOutboundNavigation?.(direction);
+      keyboardContext?.onOutboundNavigation?.(ref, direction);
     } else {
       setActiveIndex(nextIndex);
     }
@@ -75,15 +77,63 @@ export default function useGridKeyboardNavigation({
 
   const blurTargetElement = useCallback(() => ref.current?.blur(), [ref]);
 
+  const setIndexFromNavigationDirection = useCallback(
+    direction => {
+      function getRawIndex() {
+        const firstRowMiddleIndex = Math.floor(numberOfItemsInLine / 2);
+        //TODO: this can probably be extracted somehow
+        if (direction === NAV_DIRECTIONS.UP) {
+          // last row, middle
+          let result = firstRowMiddleIndex;
+          while (result + numberOfItemsInLine < itemsCount) {
+            console.log("increasing from ", result, "by ", numberOfItemsInLine, " to ", result + numberOfItemsInLine);
+            result += numberOfItemsInLine;
+          }
+          return result;
+        }
+        if (direction === NAV_DIRECTIONS.DOWN) {
+          // first row, middle
+          return firstRowMiddleIndex;
+        }
+        if (direction === NAV_DIRECTIONS.LEFT) {
+          // middle row, last item
+          let result = numberOfItemsInLine - 1;
+          const midIndex = Math.floor(itemsCount - 1 / 2);
+          while (result < midIndex) {
+            result += numberOfItemsInLine;
+          }
+          return result;
+        }
+        if (direction === NAV_DIRECTIONS.RIGHT) {
+          // middle row, first item
+          let result = 0;
+          const midIndex = Math.floor(itemsCount - 1 / 2);
+          while (result + itemsCount < midIndex) {
+            result += numberOfItemsInLine;
+          }
+          return result;
+        }
+      }
+
+      const rawIndex = getRawIndex();
+      const index = Math.max(0, Math.min(rawIndex, itemsCount - 1));
+      setActiveIndex(index);
+    },
+    [itemsCount, numberOfItemsInLine]
+  );
   const { focusWithinProps } = useFocusWithin({
-    onFocusWithinChange: isFocused => {
-      if (!isFocused) {
-        setActiveIndex(NO_ACTIVE_INDEX);
+    onFocusWithin: e => {
+      const direction = e.detail?.keyboardDirection;
+      if (direction) {
+        setIndexFromNavigationDirection(direction);
         return;
       }
       if (activeIndex === NO_ACTIVE_INDEX) {
         setActiveIndex(0);
       }
+    },
+    onBlurWithin: () => {
+      setActiveIndex(NO_ACTIVE_INDEX);
     }
   });
 
