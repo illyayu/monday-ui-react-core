@@ -1,20 +1,40 @@
 import { useCallback, useLayoutEffect, useState, useContext } from "react";
 import { useFocusWithin } from "@react-aria/interactions";
 import useFullKeyboardListeners, { NAV_DIRECTIONS } from "./useFullKeyboardListeners";
-import { GridKeyboardNavigationContext } from "../components/ColorPicker/GridKeyboardNavigationContext";
+import { GridKeyboardNavigationContext } from "../components/GridKeyboardNavigation/GridKeyboardNavigationContext";
 
 const NO_ACTIVE_INDEX = -1;
 
+/**
+ * @typedef useGridKeyboardNavigationResult
+ * @property {function} onBlur - the `onBlur` callback which should be injected to the referenced element
+ * @property {function} onFocus - the `onFocus` callback which should be injected to the referenced element
+ * @property {number} activeIndex - the currently active index
+ * @property {function} onSelectionAction - the callback which should be used when to select an item. Use this callback for onClick handlers, for example.
+ */
+
+/**
+ * A hook which is used for accessible keyboard navigation. Useful for components rendering a list of items that can be navigated with a keyboard.
+ * @param {Object} options
+ * @param {React.ElementRef} options.ref - the reference for the component that listens to keyboard
+ * @param {number} options.itemsCount - the number of items
+ * @param {number} options.numberOfItemsInLine - the number of items on each line of the grid
+ * @param {function} options.onItemClicked - the callback for selecting an item. It will be called when an active item is selected, for example with "Enter".
+ * @param {function} options.getItemByIndex - a function which gets an index as a param, and returns the item on that index
+ * @param {boolean} options.focusOnMount - if true, the referenced element will be focused when mounted
+ * @returns {useGridKeyboardNavigationResult}
+ */
 export default function useGridKeyboardNavigation({
-  ref, // the reference for the component that listens to keyboard
+  ref,
   itemsCount,
   numberOfItemsInLine,
-  onSelectionKey,
-  focusOnMount
+  onItemClicked, // the callback to call when an item is selected
+  focusOnMount,
+  getItemByIndex = () => {}
 }) {
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX);
 
-  const getIndexRow = useCallback(index => Math.ceil((index + 1) / numberOfItemsInLine), [numberOfItemsInLine]);
+  const getIndexLine = useCallback(index => Math.ceil((index + 1) / numberOfItemsInLine), [numberOfItemsInLine]);
 
   const keyboardContext = useContext(GridKeyboardNavigationContext);
 
@@ -30,9 +50,9 @@ export default function useGridKeyboardNavigation({
         if (nextIndex < 0 || itemsCount <= nextIndex) {
           return { isOutbound: true };
         }
-        const currentRow = getIndexRow(activeIndex);
-        const nextIndexRow = getIndexRow(nextIndex);
-        if (currentRow !== nextIndexRow) {
+        const currentLine = getIndexLine(activeIndex);
+        const nextIndexLine = getIndexLine(nextIndex);
+        if (currentLine !== nextIndexLine) {
           return { isOutbound: true };
         }
 
@@ -61,7 +81,7 @@ export default function useGridKeyboardNavigation({
 
     const { isOutbound, nextIndex } = calcNextIndex();
     if (isOutbound) {
-      keyboardContext?.onOutboundNavigation?.(ref, direction);
+      keyboardContext?.onOutboundNavigation(ref, direction);
     } else {
       setActiveIndex(nextIndex);
     }
@@ -80,11 +100,11 @@ export default function useGridKeyboardNavigation({
   const setIndexFromNavigationDirection = useCallback(
     direction => {
       function getRawIndex() {
-        const firstRowMiddleIndex = Math.floor(numberOfItemsInLine / 2);
+        const firstLineMiddleIndex = Math.floor(numberOfItemsInLine / 2);
         //TODO: this can probably be extracted somehow
         if (direction === NAV_DIRECTIONS.UP) {
-          // last row, middle
-          let result = firstRowMiddleIndex;
+          // last line, middle
+          let result = firstLineMiddleIndex;
           while (result + numberOfItemsInLine < itemsCount) {
             console.log("increasing from ", result, "by ", numberOfItemsInLine, " to ", result + numberOfItemsInLine);
             result += numberOfItemsInLine;
@@ -92,11 +112,11 @@ export default function useGridKeyboardNavigation({
           return result;
         }
         if (direction === NAV_DIRECTIONS.DOWN) {
-          // first row, middle
-          return firstRowMiddleIndex;
+          // first line, middle
+          return firstLineMiddleIndex;
         }
         if (direction === NAV_DIRECTIONS.LEFT) {
-          // middle row, last item
+          // middle line, last item
           let result = numberOfItemsInLine - 1;
           const midIndex = Math.floor(itemsCount - 1 / 2);
           while (result < midIndex) {
@@ -105,7 +125,7 @@ export default function useGridKeyboardNavigation({
           return result;
         }
         if (direction === NAV_DIRECTIONS.RIGHT) {
-          // middle row, first item
+          // middle line, first item
           let result = 0;
           const midIndex = Math.floor(itemsCount - 1 / 2);
           while (result + itemsCount < midIndex) {
@@ -137,17 +157,28 @@ export default function useGridKeyboardNavigation({
     }
   });
 
-  const _onSelectionKey = useCallback(() => {
-    onSelectionKey?.(activeIndex);
-  }, [onSelectionKey, activeIndex]);
+  const onSelectionAction = useCallback(
+    index => {
+      setActiveIndex(index);
+      onItemClicked(getItemByIndex(index), index);
+    },
+    [onItemClicked, getItemByIndex]
+  );
+
+  const onKeyboardSelection = useCallback(() => onSelectionAction(activeIndex), [onSelectionAction, activeIndex]);
 
   useFullKeyboardListeners({
     ref,
     onArrowNavigation,
-    onSelectionKey: _onSelectionKey,
+    onSelectionKey: onKeyboardSelection,
     onEscape: blurTargetElement,
     focusOnMount
   });
 
-  return { onBlur: focusWithinProps.onBlur, onFocus: focusWithinProps.onFocus, activeIndex, setActiveIndex };
+  return {
+    onBlur: focusWithinProps.onBlur,
+    onFocus: focusWithinProps.onFocus,
+    activeIndex,
+    onSelectionAction
+  };
 }

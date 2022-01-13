@@ -12,7 +12,10 @@ import { DEFAULT_NUMBER_OF_COLORS_IN_LINE } from "../../ColorPickerConstants";
 import { calculateColorPickerWidth } from "../../services/ColorPickerStyleService";
 import "./ColorPickerContentComponent.scss";
 import useGridKeyboardNavigation from "../../../../hooks/useGridKeyboardNavigation";
-import { GridKeyboardNavigationContext, useGridKeyboardNavigationContext } from "../../GridKeyboardNavigationContext";
+import {
+  GridKeyboardNavigationContext,
+  useGridKeyboardNavigationContext
+} from "../../../GridKeyboardNavigation/GridKeyboardNavigationContext";
 
 const Colors = React.forwardRef(
   (
@@ -32,31 +35,18 @@ const Colors = React.forwardRef(
     },
     ref
   ) => {
-    const onSelectionKey = useCallback(
-      selectedIndex => {
-        const color = colorsToRender[selectedIndex];
-        onColorClicked(color);
-      },
-      [colorsToRender, onColorClicked]
-    );
+    const getItemByIndex = useCallback(index => colorsToRender[index], [colorsToRender]);
 
-    const { onBlur, onFocus, activeIndex, setActiveIndex } = useGridKeyboardNavigation({
+    const { onBlur, onFocus, activeIndex, onSelectionAction } = useGridKeyboardNavigation({
       focusOnMount,
       ref,
-      activeIndex,
-      setActiveIndex,
-      onSelectionKey,
+      onItemClicked: onColorClicked,
       itemsCount: colorsToRender.length,
-      numberOfItemsInLine: numberOfColorsInLine
+      numberOfItemsInLine: numberOfColorsInLine,
+      getItemByIndex
     });
 
-    const onValueChange = useCallback(
-      (color, index) => () => {
-        setActiveIndex(index);
-        onColorClicked(color);
-      },
-      [onColorClicked, setActiveIndex]
-    );
+    const onValueChange = useCallback(index => () => onSelectionAction(index), [onSelectionAction]);
     return (
       <ul className={cx("color-picker")} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
         {colorsToRender.map((color, index) => {
@@ -64,7 +54,7 @@ const Colors = React.forwardRef(
             <ColorPickerItemComponent
               key={color}
               color={color}
-              onValueChange={onValueChange(color, index)}
+              onValueChange={onValueChange(index)}
               value={value}
               shouldRenderIndicatorWithoutBackground={ColorIndicatorIcon && shouldRenderIndicatorWithoutBackground}
               colorStyle={colorStyle}
@@ -83,26 +73,21 @@ const Colors = React.forwardRef(
   }
 );
 
-//TODO: is the forward ref required
 const ClearButton = React.forwardRef(({ onClick, text, Icon, isActive, onOutboundNavigation }, ref) => {
-  const { onBlur, onFocus, setActiveIndex } = useGridKeyboardNavigation({
+  const { onBlur, onFocus, onSelectionAction } = useGridKeyboardNavigation({
     ref,
-    onSelectionKey: onClick,
     itemsCount: 1,
     numberOfItemsInLine: 1,
-    onOutboundNavigation
+    onOutboundNavigation,
+    onItemClicked: onClick
   });
 
-  const _onClick = useCallback(() => {
-    setActiveIndex(0);
-    onClick();
-  }, [onClick, setActiveIndex]);
   return (
     <Button
       ref={ref}
       size={Button.sizes.SMALL}
       kind={Button.kinds.TERTIARY}
-      onClick={_onClick}
+      onClick={onSelectionAction}
       active={isActive}
       onBlur={onBlur}
       onFocus={onFocus}
