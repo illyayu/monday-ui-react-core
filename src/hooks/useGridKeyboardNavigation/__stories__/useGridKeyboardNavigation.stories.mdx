@@ -5,6 +5,7 @@ import { action } from "@storybook/addon-actions";
 import cx from "classnames";
 import range from "lodash/range";
 import "./useGridKeyboardNavigation.stories.scss";
+import Button from "../../../../src/components/Button/Button";
 
 <Meta title="Keyboard/useGridKeyboardNavigation" />
 
@@ -12,7 +13,7 @@ import "./useGridKeyboardNavigation.stories.scss";
 
 - [Overview](#overview)
 - [Arguments](#arguments)
-<!-- - [Feedback](#feedback) -->
+- [Feedback](#feedback)
 
 ## Overview
 
@@ -20,7 +21,7 @@ Used for accessible keyboard navigation. Useful for components rendering items t
 
 
 
-export const ELEMENT_WIDTH_PX = 42;
+export const ELEMENT_WIDTH_PX = 72;
 export const PADDING_PX = 24;
 
 export const ON_CLICK = action('item selected');
@@ -29,8 +30,8 @@ export const ON_CLICK = action('item selected');
   <Story name="Overview">
     {() => {
     const ref = useRef(null);
-    const itemsCount = 5;
-    const numberOfItemsInLine = 3;
+    const [itemsCount, setItemsCount] = useState(15);
+    const [numberOfItemsInLine, setNumberOfItemsInLine] = useState(4);
     const width = useMemo(() => numberOfItemsInLine * ELEMENT_WIDTH_PX + 2 * PADDING_PX, [numberOfItemsInLine]);
     const items = useMemo(() => range(itemsCount).map(num => `${num}.`), [itemsCount]);
     const getItemByIndex = useCallback(index => items[index], [items]);
@@ -43,12 +44,18 @@ export const ON_CLICK = action('item selected');
     });
     const onClickByIndex = useCallback((index) => () => onSelectionAction(index), [onSelectionAction]);
     return (
-      <div className="use-grid-keyboard-nav-comp-wrapper" style={{ width }} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
-        {items.map((item, index) => (
-          <div key={item} onClick={onClickByIndex(index)} className={cx("use-grid-keyboard-nav-item", { "active-item": index === activeIndex })}>
-            {item}
-          </div>
-        ))}
+      <div>
+        <div className="use-grid-keyboard-nav-comp-wrapper" style={{ width }} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
+          {items.map((item, index) => (
+            <Button key={item} onClick={onClickByIndex(index)} className={cx("use-grid-keyboard-nav-item", { "active-item": index === activeIndex })}>
+              {item}
+            </Button>
+          ))}
+        </div>
+        <div className="use-grid-keyboard-nav-controls">
+          <div>Items count: <input value={itemsCount} onChange={e => setItemsCount(e.target.value)} type="number" min={1}/></div>
+          <div>Number of items in line: <input value={numberOfItemsInLine} onChange={e => setNumberOfItemsInLine(e.target.value)} type="number" min={1}/></div>
+        </div>
       </div>
     );
 }}

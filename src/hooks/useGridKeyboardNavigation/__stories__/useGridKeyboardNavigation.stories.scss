@@ -12,15 +12,22 @@
 }
 
 .use-grid-keyboard-nav-item {
-    width: 30px;
+    width: 60px;
     margin: $spacing-xs-small;
-    padding: 0 $spacing-xs;
-    border: $wolf-gray 3px solid;
-    font-size: $font-size-default;
-    border-radius: $border-radius-small;
-    cursor: pointer;
 
     &.active-item {
         @include focus-style-css();
+    }
+}
+
+.use-grid-keyboard-nav-controls {
+    display: flex;
+
+    & :not(:first-child) {
+        margin-left: $spacing-medium;
+    }
+
+    input {
+        width: 60px;
     }
 }
