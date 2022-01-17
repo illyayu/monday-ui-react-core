@@ -1,10 +1,10 @@
 import { useRef, useCallback, useState, useMemo } from "react";
 import { ArgsTable, Story, Canvas, Meta } from "@storybook/addon-docs";
 import useGridKeyboardNavigation from "../useGridKeyboardNavigation";
-import "../../__stories__/general-hooks-stories.scss";
 import { action } from "@storybook/addon-actions";
-import cx from 'classnames';
-import range from 'lodash/range';
+import cx from "classnames";
+import range from "lodash/range";
+import "./useGridKeyboardNavigation.stories.scss";
 
 <Meta title="Keyboard/useGridKeyboardNavigation" />
 
@@ -19,7 +19,8 @@ import range from 'lodash/range';
 Used for accessible keyboard navigation. Useful for components rendering items that can be navigated and selected with a keyboard.
 
 
-export const ELEMENT_WIDTH_PX = 30;
+
+export const ELEMENT_WIDTH_PX = 42;
 export const PADDING_PX = 24;
 
 export const ON_CLICK = action('item selected');
@@ -31,7 +32,7 @@ export const ON_CLICK = action('item selected');
     const itemsCount = 5;
     const numberOfItemsInLine = 3;
     const width = useMemo(() => numberOfItemsInLine * ELEMENT_WIDTH_PX + 2 * PADDING_PX, [numberOfItemsInLine]);
-    const items = useMemo(() => range(itemsCount).map(num => `-${num}-`), [itemsCount]);
+    const items = useMemo(() => range(itemsCount).map(num => `${num}.`), [itemsCount]);
     const getItemByIndex = useCallback(index => items[index], [items]);
     const { activeIndex, onFocus, onBlur, onSelectionAction } = useGridKeyboardNavigation({
       ref,
@@ -42,9 +43,9 @@ export const ON_CLICK = action('item selected');
     });
     const onClickByIndex = useCallback((index) => () => onSelectionAction(index), [onSelectionAction]);
     return (
-      <div style={{ padding: PADDING_PX, width, display: 'flex', flexWrap: 'wrap' }} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
+      <div className="use-grid-keyboard-nav-comp-wrapper" style={{ width }} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
         {items.map((item, index) => (
-          <div key={item} onClick={onClickByIndex(index)} style={{width: ELEMENT_WIDTH_PX}} className={cx("item", { "active-item": index === activeIndex })}>
+          <div key={item} onClick={onClickByIndex(index)} className={cx("use-grid-keyboard-nav-item", { "active-item": index === activeIndex })}>
             {item}
           </div>
         ))}

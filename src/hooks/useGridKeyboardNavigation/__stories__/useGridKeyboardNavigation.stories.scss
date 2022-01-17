@@ -1,0 +1,26 @@
+@import "../../__stories__/general-hooks-stories.scss";
+@import "../../../styles/states.scss";
+@import "../../../styles/typography.scss";
+@import "../../../styles/global-css-settings.scss";
+
+.use-grid-keyboard-nav-comp-wrapper {
+    padding: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    outline: none;
+    text-align: center;
+}
+
+.use-grid-keyboard-nav-item {
+    width: 30px;
+    margin: $spacing-xs-small;
+    padding: 0 $spacing-xs;
+    border: $wolf-gray 3px solid;
+    font-size: $font-size-default;
+    border-radius: $border-radius-small;
+    cursor: pointer;
+
+    &.active-item {
+        @include focus-style-css();
+    }
+}
