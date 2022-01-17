@@ -10,7 +10,7 @@ const NO_ACTIVE_INDEX = -1;
  * @property {React.FocusEventHandler<HTMLElement>} onBlur - the `onBlur` callback which should be injected to the referenced element
  * @property {React.FocusEventHandler<HTMLElement>} onFocus - the `onFocus` callback which should be injected to the referenced element
  * @property {number} activeIndex - the currently active index
- * @property {function} onSelectionAction - the callback which should be used when to select an item. Use this callback for onClick handlers, for example.
+ * @property {function} onSelectionAction - the callback which should be used to select an item. It should be called with the selected item's index. Use this callback for onClick handlers, for example.
  */
 
 /**

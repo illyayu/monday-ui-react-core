@@ -11,7 +11,7 @@ import ColorPickerItemComponent from "../ColorPickerItemComponent/ColorPickerIte
 import { DEFAULT_NUMBER_OF_COLORS_IN_LINE } from "../../ColorPickerConstants";
 import { calculateColorPickerWidth } from "../../services/ColorPickerStyleService";
 import "./ColorPickerContentComponent.scss";
-import useGridKeyboardNavigation from "../../../../hooks/useGridKeyboardNavigation";
+import useGridKeyboardNavigation from "../../../../hooks/useGridKeyboardNavigation/useGridKeyboardNavigation";
 import {
   GridKeyboardNavigationContext,
   useGridKeyboardNavigationContext
