@@ -16,7 +16,7 @@ const NO_ACTIVE_INDEX = -1;
 /**
  * A hook which is used for accessible keyboard navigation. Useful for components rendering a list of items that can be navigated and selected with a keyboard.
  * @param {Object} options
- * @param {React.ElementRef} options.ref - the reference for the component that listens to keyboard
+ * @param {React.MutableRefObject} options.ref - the reference for the component that listens to keyboard
  * @param {number} options.itemsCount - the number of items
  * @param {number} options.numberOfItemsInLine - the number of items on each line of the grid
  * @param {function} options.onItemClicked - the callback for selecting an item. It will be called when an active item is selected, for example with "Enter".

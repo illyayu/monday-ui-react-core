@@ -9,9 +9,10 @@ import Button from "../../../../src/components/Button/Button";
 
 <Meta title="Keyboard/useGridKeyboardNavigation" />
 
-# useEventListener
+# useGridKeyboardNavigation
 
 - [Overview](#overview)
+- [Usage](#usage)
 - [Arguments](#arguments)
 - [Feedback](#feedback)
 
@@ -62,32 +63,55 @@ export const ON_CLICK = action('item selected');
   </Story>
 </Canvas>
 
-<!-- ## Arguments
+## Usage
+
+<UsageGuidelines
+  guidelines={["Use this hook when you want to add keyboard navigation to a grid-like component."]}
+/>
+
+## Arguments
 
 <FunctionArguments>
   <FunctionArgument name="options" type="Object">
     <FunctionArgument
       name="ref"
       type="React.MutableRefObject"
-      description={<>A React <a href="https://reactjs.org/docs/hooks-reference.html#useref" target="_blank" rel="noopener noreferrer">ref</a> object.</>}
-    />
-    <FunctionArgument
-      name="callback"
-      type="(event: Event) => void"
-      description="Callback function to execute when the event is fired."
+      description={<>A React <a href="https://reactjs.org/docs/hooks-reference.html#useref" target="_blank" rel="noopener noreferrer">ref</a> object. The reference for the component that listens to keyboard. <br/>
+      <b>Important:</b> the referred element must have a <code>tabIndex={-1}</code> for the focus to work properly.</>}
       required
     />
     <FunctionArgument
-      name="eventName"
-      type="string"
-      description={<>The event to listen to. See <a href="https://developer.mozilla.org/en-US/docs/Web/Events" target="_blank" rel="noopener noreferrer">a full list</a> for more info.</>}
+      name="itemsCount"
+      type="Number"
+      description="The number of items."
       required
     />
     <FunctionArgument
-      name="capture"
+      name="numberOfItemsInLine"
+      type="Number"
+      description="The number of items on each line of the grid."
+      required
+    />
+    <FunctionArgument
+      name="onItemClicked"
+      type="(item, index) => void"
+      description="The callback for selecting an item. It will be called when an active item is selected, for example with 'Enter'."
+      required
+    />
+    <FunctionArgument
+      name="getItemByIndex"
+      type="(index) => item"
+      description="A function which gets an index as a param, and returns the item on that index."
+    />
+    <FunctionArgument
+      name="focusOnMount"
       type="boolean"
-      description="Whether to capture the event before bubbling up or not."
-      default="false"
+      description="If true, the referenced element will be focused when mounted."
     />
+
+
+
+
+
   </FunctionArgument>
-</FunctionArguments> -->
+</FunctionArguments>
