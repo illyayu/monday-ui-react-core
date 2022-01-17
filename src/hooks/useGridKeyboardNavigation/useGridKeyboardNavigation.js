@@ -1,7 +1,7 @@
 import { useCallback, useLayoutEffect, useState, useContext } from "react";
 import { useFocusWithin } from "@react-aria/interactions";
-import useFullKeyboardListeners, { NAV_DIRECTIONS } from "./useFullKeyboardListeners";
-import { GridKeyboardNavigationContext } from "../components/GridKeyboardNavigation/GridKeyboardNavigationContext";
+import useFullKeyboardListeners, { NAV_DIRECTIONS } from "../useFullKeyboardListeners";
+import { GridKeyboardNavigationContext } from "../../components/GridKeyboardNavigation/GridKeyboardNavigationContext";
 
 const NO_ACTIVE_INDEX = -1;
 
