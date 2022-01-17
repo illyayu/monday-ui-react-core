@@ -14,6 +14,7 @@ import Button from "../../../../src/components/Button/Button";
 - [Overview](#overview)
 - [Usage](#usage)
 - [Arguments](#arguments)
+- [Returns](#returns)
 - [Feedback](#feedback)
 
 ## Overview
@@ -108,10 +109,29 @@ export const ON_CLICK = action('item selected');
       type="boolean"
       description="If true, the referenced element will be focused when mounted."
     />
+  </FunctionArgument>
+</FunctionArguments>
 
 
+## Returns
 
-
-
+<FunctionArguments>
+  <FunctionArgument name="result" type="Object">
+    <FunctionArgument name="activeIndex" type="number" description="The index of the currently active item." />
+    <FunctionArgument
+      name="onSelectionAction"
+      type="(itemIndex) => void"
+      description={<>A wrapper around the passed <code>onItemClicked</code> function. Use it as the handler for selecting items (e.g. <code>onClick</code>)</>}
+    />
+    <FunctionArgument
+      name="onFocus"
+      type="React.FocusEventHandler<HTMLElement>"
+      description={<>The <code>onFocus</code> handler which should be injected to the element which <code>ref</code> is referring to.</>}
+    />
+    <FunctionArgument
+      name="onBlur"
+      type="React.FocusEventHandler<HTMLElement>"
+      description={<>The <code>onBlur</code> handler which should be injected to the element which <code>ref</code> is referring to.</>}
+    />
   </FunctionArgument>
 </FunctionArguments>
