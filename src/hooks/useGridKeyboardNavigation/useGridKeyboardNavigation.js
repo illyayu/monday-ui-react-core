@@ -7,21 +7,21 @@ const NO_ACTIVE_INDEX = -1;
 
 /**
  * @typedef useGridKeyboardNavigationResult
- * @property {function} onBlur - the `onBlur` callback which should be injected to the referenced element
- * @property {function} onFocus - the `onFocus` callback which should be injected to the referenced element
+ * @property {React.FocusEventHandler<HTMLElement>} onBlur - the `onBlur` callback which should be injected to the referenced element
+ * @property {React.FocusEventHandler<HTMLElement>} onFocus - the `onFocus` callback which should be injected to the referenced element
  * @property {number} activeIndex - the currently active index
  * @property {function} onSelectionAction - the callback which should be used when to select an item. Use this callback for onClick handlers, for example.
  */
 
 /**
- * A hook which is used for accessible keyboard navigation. Useful for components rendering a list of items that can be navigated with a keyboard.
+ * A hook which is used for accessible keyboard navigation. Useful for components rendering a list of items that can be navigated and selected with a keyboard.
  * @param {Object} options
  * @param {React.ElementRef} options.ref - the reference for the component that listens to keyboard
  * @param {number} options.itemsCount - the number of items
  * @param {number} options.numberOfItemsInLine - the number of items on each line of the grid
  * @param {function} options.onItemClicked - the callback for selecting an item. It will be called when an active item is selected, for example with "Enter".
  * @param {function} options.getItemByIndex - a function which gets an index as a param, and returns the item on that index
- * @param {boolean} options.focusOnMount - if true, the referenced element will be focused when mounted
+ * @param {boolean=} options.focusOnMount - if true, the referenced element will be focused when mounted
  * @returns {useGridKeyboardNavigationResult}
  */
 export default function useGridKeyboardNavigation({
@@ -29,7 +29,7 @@ export default function useGridKeyboardNavigation({
   itemsCount,
   numberOfItemsInLine,
   onItemClicked, // the callback to call when an item is selected
-  focusOnMount,
+  focusOnMount = false,
   getItemByIndex = () => {}
 }) {
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX);
