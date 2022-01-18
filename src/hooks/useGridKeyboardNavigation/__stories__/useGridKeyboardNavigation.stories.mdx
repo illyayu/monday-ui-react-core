@@ -49,7 +49,11 @@ export const ON_CLICK = action('item selected');
       <div>
         <div className="use-grid-keyboard-nav-comp-wrapper" style={{ width }} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
           {items.map((item, index) => (
-            <Button key={item} onClick={onClickByIndex(index)} className={cx("use-grid-keyboard-nav-item", { "active-item": index === activeIndex })}>
+            <Button 
+              key={item} 
+              onClick={onClickByIndex(index)} 
+              kind={Button.kinds.SECONDARY}
+              className={cx("use-grid-keyboard-nav-item", { "active-item": index === activeIndex })}>
               {item}
             </Button>
           ))}

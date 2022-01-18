@@ -23,7 +23,6 @@ const calcMapping = positions => {
   return directionsMaps;
 };
 
-//TODO: deal with components that are removed, should be unset
 export const useGridKeyboardNavigationContext = (positions, wrapperRef) => {
   const verticalPositioning = useRef(calcMapping(positions));
   const upperContext = useContext(GridKeyboardNavigationContext);
