@@ -11,14 +11,18 @@ import {
   withColorsStateDecorator
 } from "./ColorPicker.stories";
 
-export const argTypes = createStoryMetaSettings({
+export const metaSettings = createStoryMetaSettings({
   component: ColorPicker,
   enumPropNamesArray: ["colorStyle", "colorSize"],
+  actionPropsArray: [{name: "onSave", linkedToPropValue: "value"}]
 });
 
-export const decorators = [
-  createControlledInputDecorator({fromCbProp: 'onSave', toProp: 'value'})
-];
+<Meta 
+  title="Pickers/ColorPicker"
+  component={ ColorPicker }
+  argTypes={ metaSettings.argTypes }
+  decorators={ metaSettings.decorators }
+/>
 
 <Meta title="Pickers/ColorPicker" component={ColorPicker} argTypes={argTypes} decorators={decorators}/>
 
