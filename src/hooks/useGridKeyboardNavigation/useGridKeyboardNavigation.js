@@ -2,6 +2,7 @@ import { useCallback, useLayoutEffect, useState, useContext } from "react";
 import { useFocusWithin } from "@react-aria/interactions";
 import useFullKeyboardListeners, { NAV_DIRECTIONS } from "../useFullKeyboardListeners";
 import { GridKeyboardNavigationContext } from "../../components/GridKeyboardNavigation/GridKeyboardNavigationContext";
+import { calcActiveIndexAfterArrowNavigation, getActiveIndexFromInboundNavigation } from "./gridKeyboardNavigationHelper";
 
 const NO_ACTIVE_INDEX = -1;
 
@@ -34,7 +35,6 @@ export default function useGridKeyboardNavigation({
 }) {
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX);
 
-  const getIndexLine = useCallback(index => Math.ceil((index + 1) / numberOfItemsInLine), [numberOfItemsInLine]);
 
   const keyboardContext = useContext(GridKeyboardNavigationContext);
 
@@ -44,42 +44,12 @@ export default function useGridKeyboardNavigation({
       return;
     }
 
-    const calcNextIndex = () => {
-      const horizontalChange = isIndexIncrease => {
-        const nextIndex = activeIndex + (isIndexIncrease ? 1 : -1);
-        if (nextIndex < 0 || itemsCount <= nextIndex) {
-          return { isOutbound: true };
-        }
-        const currentLine = getIndexLine(activeIndex);
-        const nextIndexLine = getIndexLine(nextIndex);
-        if (currentLine !== nextIndexLine) {
-          return { isOutbound: true };
-        }
-
-        return { isOutbound: false, nextIndex };
-      };
-
-      const verticalChange = isIndexIncrease => {
-        const nextIndex = activeIndex + numberOfItemsInLine * (isIndexIncrease ? 1 : -1);
-        if (nextIndex < 0 || itemsCount <= nextIndex) {
-          return { isOutbound: true };
-        }
-        return { isOutbound: false, nextIndex };
-      };
-
-      switch (direction) {
-        case NAV_DIRECTIONS.RIGHT:
-          return horizontalChange(true);
-        case NAV_DIRECTIONS.LEFT:
-          return horizontalChange(false);
-        case NAV_DIRECTIONS.DOWN:
-          return verticalChange(true);
-        case NAV_DIRECTIONS.UP:
-          return verticalChange(false);
-      }
-    };
-
-    const { isOutbound, nextIndex } = calcNextIndex();
+    const { isOutbound, nextIndex } = calcActiveIndexAfterArrowNavigation({
+      activeIndex,
+      itemsCount,
+      numberOfItemsInLine,
+      direction
+    });
     if (isOutbound) {
       keyboardContext?.onOutboundNavigation(ref, direction);
     } else {
@@ -97,55 +67,12 @@ export default function useGridKeyboardNavigation({
 
   const blurTargetElement = useCallback(() => ref.current?.blur(), [ref]);
 
-  const setIndexFromNavigationDirection = useCallback(
-    direction => {
-      function getRawIndex() {
-        const firstLineMiddleIndex = Math.floor(numberOfItemsInLine / 2);
-        //TODO: this can probably be extracted somehow
-        if (direction === NAV_DIRECTIONS.UP) {
-          // last line, middle
-          let result = firstLineMiddleIndex;
-          while (result + numberOfItemsInLine < itemsCount) {
-            console.log("increasing from ", result, "by ", numberOfItemsInLine, " to ", result + numberOfItemsInLine);
-            result += numberOfItemsInLine;
-          }
-          return result;
-        }
-        if (direction === NAV_DIRECTIONS.DOWN) {
-          // first line, middle
-          return firstLineMiddleIndex;
-        }
-        if (direction === NAV_DIRECTIONS.LEFT) {
-          // middle line, last item
-          let result = numberOfItemsInLine - 1;
-          const midIndex = Math.floor(itemsCount - 1 / 2);
-          while (result < midIndex) {
-            result += numberOfItemsInLine;
-          }
-          return result;
-        }
-        if (direction === NAV_DIRECTIONS.RIGHT) {
-          // middle line, first item
-          let result = 0;
-          const midIndex = Math.floor(itemsCount - 1 / 2);
-          while (result + itemsCount < midIndex) {
-            result += numberOfItemsInLine;
-          }
-          return result;
-        }
-      }
-
-      const rawIndex = getRawIndex();
-      const index = Math.max(0, Math.min(rawIndex, itemsCount - 1));
-      setActiveIndex(index);
-    },
-    [itemsCount, numberOfItemsInLine]
-  );
   const { focusWithinProps } = useFocusWithin({
     onFocusWithin: e => {
       const direction = e.detail?.keyboardDirection;
       if (direction) {
-        setIndexFromNavigationDirection(direction);
+        const newIndex = getActiveIndexFromInboundNavigation({direction, numberOfItemsInLine, itemsCount});
+        setActiveIndex(newIndex);
         return;
       }
       if (activeIndex === NO_ACTIVE_INDEX) {
