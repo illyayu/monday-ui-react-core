@@ -37,7 +37,7 @@ const Colors = React.forwardRef(
   ) => {
     const getItemByIndex = useCallback(index => colorsToRender[index], [colorsToRender]);
 
-    const { onBlur, onFocus, activeIndex, onSelectionAction } = useGridKeyboardNavigation({
+    const { activeIndex, onSelectionAction } = useGridKeyboardNavigation({
       focusOnMount,
       ref,
       onItemClicked: onColorClicked,
@@ -48,7 +48,7 @@ const Colors = React.forwardRef(
 
     const onValueChange = useCallback(index => () => onSelectionAction(index), [onSelectionAction]);
     return (
-      <ul className={cx("color-picker")} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
+      <ul className={cx("color-picker")} ref={ref} tabIndex={-1}>
         {colorsToRender.map((color, index) => {
           return (
             <ColorPickerItemComponent
@@ -74,7 +74,7 @@ const Colors = React.forwardRef(
 );
 
 const ClearButton = React.forwardRef(({ onClick, text, Icon, isActive, onOutboundNavigation }, ref) => {
-  const { onBlur, onFocus, onSelectionAction } = useGridKeyboardNavigation({
+  const { onSelectionAction } = useGridKeyboardNavigation({
     ref,
     itemsCount: 1,
     numberOfItemsInLine: 1,
@@ -89,8 +89,6 @@ const ClearButton = React.forwardRef(({ onClick, text, Icon, isActive, onOutboun
       kind={Button.kinds.TERTIARY}
       onClick={onSelectionAction}
       active={isActive}
-      onBlur={onBlur}
-      onFocus={onFocus}
       className="clear-color-button"
     >
       <Icon size="16" className="clear-color-icon" />

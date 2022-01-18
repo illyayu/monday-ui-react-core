@@ -37,7 +37,7 @@ export const ON_CLICK = action('item selected');
     const width = useMemo(() => numberOfItemsInLine * ELEMENT_WIDTH_PX + 2 * PADDING_PX, [numberOfItemsInLine]);
     const items = useMemo(() => range(itemsCount).map(num => `${num}.`), [itemsCount]);
     const getItemByIndex = useCallback(index => items[index], [items]);
-    const { activeIndex, onFocus, onBlur, onSelectionAction } = useGridKeyboardNavigation({
+    const { activeIndex, onSelectionAction } = useGridKeyboardNavigation({
       ref,
       numberOfItemsInLine,
       itemsCount,
@@ -47,7 +47,7 @@ export const ON_CLICK = action('item selected');
     const onClickByIndex = useCallback((index) => () => onSelectionAction(index), [onSelectionAction]);
     return (
       <div>
-        <div className="use-grid-keyboard-nav-comp-wrapper" style={{ width }} ref={ref} tabIndex={-1} onBlur={onBlur} onFocus={onFocus}>
+        <div className="use-grid-keyboard-nav-comp-wrapper" style={{ width }} ref={ref} tabIndex={-1}>
           {items.map((item, index) => (
             <Button 
               key={item} 
@@ -126,16 +126,6 @@ export const ON_CLICK = action('item selected');
       name="onSelectionAction"
       type="(itemIndex) => void"
       description={<>A wrapper around the passed <code>onItemClicked</code> function. Use it as the handler for selecting items (e.g. <code>onClick</code>)</>}
-    />
-    <FunctionArgument
-      name="onFocus"
-      type="React.FocusEventHandler<HTMLElement>"
-      description={<>The <code>onFocus</code> handler which should be injected to the element which <code>ref</code> is referring to.</>}
-    />
-    <FunctionArgument
-      name="onBlur"
-      type="React.FocusEventHandler<HTMLElement>"
-      description={<>The <code>onBlur</code> handler which should be injected to the element which <code>ref</code> is referring to.</>}
     />
   </FunctionArgument>
 </FunctionArguments>

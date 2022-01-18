@@ -41,8 +41,7 @@ describe("useGridKeyboardNavigation", () => {
   it("should set the active index to 0 when focusing for the first time", () => {
     const { result } = renderHookForTest({ });
 
-    // testing this with a real component is difficult, so we only test the callback
-    act(() => result.current.onFocus(new Event('focus')));
+    act(() => element.dispatchEvent(new Event('focus')));
 
     expect(result.current.activeIndex).toBe(0);
   });
@@ -51,8 +50,7 @@ describe("useGridKeyboardNavigation", () => {
     const items = itemsArray(9);
     const { result } = renderHookForTest({ items, numberOfItemsInLine: 3 });
 
-    // testing this with a real component is difficult, so we only test the callback
-    act(() => result.current.onFocus(new CustomEvent('focus', { detail: { keyboardDirection: NAV_DIRECTIONS.LEFT }})));
+    act(() => element.dispatchEvent(new CustomEvent("focus", { detail: { keyboardDirection: NAV_DIRECTIONS.LEFT } })));
 
     expect(result.current.activeIndex).toBe(5); // last index of the right-most line
   });

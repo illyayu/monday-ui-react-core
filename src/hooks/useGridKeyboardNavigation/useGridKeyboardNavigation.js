@@ -1,15 +1,13 @@
 import { useCallback, useLayoutEffect, useState, useContext } from "react";
-import { useFocusWithin } from "@react-aria/interactions";
 import useFullKeyboardListeners from "../useFullKeyboardListeners";
 import { GridKeyboardNavigationContext } from "../../components/GridKeyboardNavigation/GridKeyboardNavigationContext";
 import { calcActiveIndexAfterArrowNavigation, getActiveIndexFromInboundNavigation } from "./gridKeyboardNavigationHelper";
+import useEventListener from "../useEventListener";
 
 const NO_ACTIVE_INDEX = -1;
 
 /**
  * @typedef useGridKeyboardNavigationResult
- * @property {React.FocusEventHandler<HTMLElement>} onBlur - the `onBlur` callback which should be injected to the referenced element
- * @property {React.FocusEventHandler<HTMLElement>} onFocus - the `onFocus` callback which should be injected to the referenced element
  * @property {number} activeIndex - the currently active index
  * @property {function} onSelectionAction - the callback which should be used to select an item. It should be called with the selected item's index. Use this callback for onClick handlers, for example.
  */
@@ -66,22 +64,22 @@ export default function useGridKeyboardNavigation({
 
   const blurTargetElement = useCallback(() => ref.current?.blur(), [ref]);
 
-  const { focusWithinProps } = useFocusWithin({
-    onFocusWithin: e => {
-      const direction = e.detail?.keyboardDirection;
-      if (direction) {
-        const newIndex = getActiveIndexFromInboundNavigation({ direction, numberOfItemsInLine, itemsCount });
-        setActiveIndex(newIndex);
-        return;
-      }
-      if (activeIndex === NO_ACTIVE_INDEX) {
-        setActiveIndex(0);
-      }
-    },
-    onBlurWithin: () => {
-      setActiveIndex(NO_ACTIVE_INDEX);
+  const onFocus = useCallback(e => {
+    const direction = e.detail?.keyboardDirection;
+    if (direction) {
+      const newIndex = getActiveIndexFromInboundNavigation({ direction, numberOfItemsInLine, itemsCount });
+      setActiveIndex(newIndex);
+      return;
     }
-  });
+    if (activeIndex === NO_ACTIVE_INDEX) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, itemsCount, numberOfItemsInLine]);
+
+  const onBlur = useCallback(() => setActiveIndex(NO_ACTIVE_INDEX), [setActiveIndex]);
+
+  useEventListener({ eventName: "focus", callback: onFocus, ref });
+  useEventListener({ eventName: "blur", callback: onBlur, ref });
 
   const onSelectionAction = useCallback(
     index => {
@@ -102,8 +100,6 @@ export default function useGridKeyboardNavigation({
   });
 
   return {
-    onBlur: focusWithinProps.onBlur,
-    onFocus: focusWithinProps.onFocus,
     activeIndex,
     onSelectionAction
   };
