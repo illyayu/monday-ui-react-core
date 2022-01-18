@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useState, useContext } from "react";
 import { useFocusWithin } from "@react-aria/interactions";
-import useFullKeyboardListeners, { NAV_DIRECTIONS } from "../useFullKeyboardListeners";
+import useFullKeyboardListeners from "../useFullKeyboardListeners";
 import { GridKeyboardNavigationContext } from "../../components/GridKeyboardNavigation/GridKeyboardNavigationContext";
 import { calcActiveIndexAfterArrowNavigation, getActiveIndexFromInboundNavigation } from "./gridKeyboardNavigationHelper";
 
@@ -34,7 +34,6 @@ export default function useGridKeyboardNavigation({
   getItemByIndex = () => {}
 }) {
   const [activeIndex, setActiveIndex] = useState(NO_ACTIVE_INDEX);
-
 
   const keyboardContext = useContext(GridKeyboardNavigationContext);
 
@@ -71,7 +70,7 @@ export default function useGridKeyboardNavigation({
     onFocusWithin: e => {
       const direction = e.detail?.keyboardDirection;
       if (direction) {
-        const newIndex = getActiveIndexFromInboundNavigation({direction, numberOfItemsInLine, itemsCount});
+        const newIndex = getActiveIndexFromInboundNavigation({ direction, numberOfItemsInLine, itemsCount });
         setActiveIndex(newIndex);
         return;
       }

@@ -136,7 +136,7 @@ describe("getActiveIndexFromInboundNavigation", () => {
 
       expect(result).toEqual(expectedResult);
     });
-  
+
     it("should return the third item in the first row when the first row has 3 elements out of 5", () => {
       const itemsCount = 3;
       const numberOfItemsInLine = 5;
@@ -173,12 +173,12 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
 
       expect(result).toEqual(expectedResult);
     });
-  
+
     it("should return 'isOutbound = true' when navigating from 3rd item of first row", () => {
       const itemsCount = 5;
       const numberOfItemsInLine = 4;
       const activeIndex = 2;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
@@ -189,7 +189,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
       const itemsCount = 5;
       const numberOfItemsInLine = 4;
       const activeIndex = 0;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
@@ -210,12 +210,12 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
 
       expect(result).toEqual(expectedResult);
     });
-  
+
     it("should return 'isOutbound = true' when navigating from the 3rd index of the first row, and second row has only 2 items", () => {
       const itemsCount = 5;
       const numberOfItemsInLine = 3;
       const activeIndex = 2;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
@@ -226,7 +226,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
       const itemsCount = 5;
       const numberOfItemsInLine = 3;
       const activeIndex = 3;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
@@ -236,7 +236,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
 
   describe("direction - left", () => {
     const direction = NAV_DIRECTIONS.LEFT;
-    
+
     it("should return the second index of the second row when navigating from the third index of the second row", () => {
       const itemsCount = 9;
       const numberOfItemsInLine = 4;
@@ -252,7 +252,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
       const itemsCount = 9;
       const numberOfItemsInLine = 4;
       const activeIndex = 4;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
@@ -263,7 +263,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
       const itemsCount = 9;
       const numberOfItemsInLine = 4;
       const activeIndex = 0;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
@@ -273,7 +273,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
 
   describe("direction - right", () => {
     const direction = NAV_DIRECTIONS.RIGHT;
-    
+
     it("should return the third index of the second row when navigating from the second index of the second row", () => {
       const itemsCount = 9;
       const numberOfItemsInLine = 4;
@@ -289,7 +289,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
       const itemsCount = 9;
       const numberOfItemsInLine = 4;
       const activeIndex = 7;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
@@ -300,7 +300,7 @@ describe("calcActiveIndexAfterArrowNavigation", () => {
       const itemsCount = 5;
       const numberOfItemsInLine = 3;
       const activeIndex = 4;
-      const expectedResult = { isOutbound: true};
+      const expectedResult = { isOutbound: true };
 
       const result = calcActiveIndexAfterArrowNavigation({ direction, itemsCount, numberOfItemsInLine, activeIndex });
 
