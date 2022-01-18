@@ -14,7 +14,7 @@ const ON_CLICK = action("Selected");
 
 export const DummyNavigableGrid = forwardRef(({ itemsCount, numberOfItemsInLine, itemPrefix }, ref) => {
   const width = useMemo(() => numberOfItemsInLine * ELEMENT_WIDTH_PX + 2 * PADDING_PX, [numberOfItemsInLine]);
-  const items = useMemo(() => range(itemsCount).map(num => `${itemPrefix} ${num}`), [itemsCount]);
+  const items = useMemo(() => range(itemsCount).map(num => `${itemPrefix} ${num}`), [itemPrefix, itemsCount]);
   const getItemByIndex = useCallback(index => items[index], [items]);
   const { activeIndex, onSelectionAction } = useGridKeyboardNavigation({
     ref,

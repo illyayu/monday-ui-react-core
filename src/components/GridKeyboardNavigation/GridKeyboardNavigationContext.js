@@ -37,6 +37,15 @@ const getOutmostElementToFocus = (directionMaps, keyboardDirection) => {
   })();
   const directionMap = directionMaps[oppositeDirection];
   const firstEntry = [...directionMap][0]; // start with any element
+  if (!firstEntry) {
+    // no relations were registered for this direction - fallback to a different direction
+    if ([NAV_DIRECTIONS.LEFT, NAV_DIRECTIONS.RIGHT].includes(keyboardDirection)) {
+      // there are no registered horizontal relations registered, try vertical relations. Get the top-most element.
+      return getOutmostElementToFocus(directionMaps, NAV_DIRECTIONS.BOTTOM);
+    }
+    // there are no registered vertical relations registered, try horizontal relations. Get the left-most element.
+    return getOutmostElementToFocus(directionMaps, NAV_DIRECTIONS.RIGHT);
+  }
   let result = firstEntry?.[0];
   while (directionMap.get(result)) {
     // as long as there's an element which is outward of the keyboard direction, take it.
