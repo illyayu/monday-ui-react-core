@@ -27,24 +27,24 @@ const getDirectionMaps = positions => {
 const focusElementWithDirection = (elementRef, direction) =>
   elementRef?.current?.dispatchEvent(new CustomEvent("focus", { detail: { keyboardDirection: direction } }));
 
-// TODO: extract and test
-const getOutmostElementToFocus = (directionMaps, keyboardDirection) => {
-  const oppositeDirection = (() => {
-    if (keyboardDirection === NAV_DIRECTIONS.LEFT) return NAV_DIRECTIONS.RIGHT;
-    if (keyboardDirection === NAV_DIRECTIONS.RIGHT) return NAV_DIRECTIONS.LEFT;
-    if (keyboardDirection === NAV_DIRECTIONS.UP) return NAV_DIRECTIONS.DOWN;
-    if (keyboardDirection === NAV_DIRECTIONS.DOWN) return NAV_DIRECTIONS.UP;
-  })();
-  const directionMap = directionMaps[oppositeDirection];
+const getOppositeDirection = direction => {
+  if (direction === NAV_DIRECTIONS.LEFT) return NAV_DIRECTIONS.RIGHT;
+  if (direction === NAV_DIRECTIONS.RIGHT) return NAV_DIRECTIONS.LEFT;
+  if (direction === NAV_DIRECTIONS.UP) return NAV_DIRECTIONS.DOWN;
+  if (direction === NAV_DIRECTIONS.DOWN) return NAV_DIRECTIONS.UP;
+};
+
+const getOutmostElementToFocus = (directionMaps, direction) => {
+  const directionMap = directionMaps[direction];
   const firstEntry = [...directionMap][0]; // start with any element
   if (!firstEntry) {
     // no relations were registered for this direction - fallback to a different direction
-    if ([NAV_DIRECTIONS.LEFT, NAV_DIRECTIONS.RIGHT].includes(keyboardDirection)) {
+    if ([NAV_DIRECTIONS.LEFT, NAV_DIRECTIONS.RIGHT].includes(direction)) {
       // there are no registered horizontal relations registered, try vertical relations. Get the top-most element.
-      return getOutmostElementToFocus(directionMaps, NAV_DIRECTIONS.BOTTOM);
+      return getOutmostElementToFocus(directionMaps, NAV_DIRECTIONS.UP);
     }
     // there are no registered vertical relations registered, try horizontal relations. Get the left-most element.
-    return getOutmostElementToFocus(directionMaps, NAV_DIRECTIONS.RIGHT);
+    return getOutmostElementToFocus(directionMaps, NAV_DIRECTIONS.LEFT);
   }
   let result = firstEntry?.[0];
   while (directionMap.get(result)) {
@@ -64,8 +64,8 @@ export const useGridKeyboardNavigationContext = (positions, wrapperRef) => {
       if (!keyboardDirection) {
         return;
       }
-
-      const elementToFocus = getOutmostElementToFocus(directionMaps.current, keyboardDirection);
+      const oppositeDirection = getOppositeDirection(keyboardDirection);
+      const elementToFocus = getOutmostElementToFocus(directionMaps.current, oppositeDirection);
       focusElementWithDirection(elementToFocus, keyboardDirection);
     },
     [directionMaps]
