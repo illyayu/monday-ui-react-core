@@ -23,7 +23,7 @@ describe("useGridKeyboardNavigation", () => {
     element = document.createElement("div");
     document.body.appendChild(element);
 
-    const renderResult = renderHook(
+    return renderHook(
       () =>
         useGridKeyboardNavigation({
           ref: { current: element },
@@ -34,8 +34,6 @@ describe("useGridKeyboardNavigation", () => {
           numberOfItemsInLine
         })
     );
-
-    return renderResult;
   }
 
   it("should set the active index to 0 when focusing for the first time", () => {
